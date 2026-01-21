@@ -1,0 +1,6 @@
+io.github._0xorigin.flexscheduler.configs.AsyncConfig
+io.github._0xorigin.flexscheduler.configs.TaskSchedulerConfig
+io.github._0xorigin.flexscheduler.configs.FlexSchedulerPackageAutoConfiguration
+io.github._0xorigin.flexscheduler.configs.FlexSchedulerRepositoryAutoConfiguration
+io.github._0xorigin.flexscheduler.configs.FlexSchedulerLiquibaseAutoConfiguration
+io.github._0xorigin.flexscheduler.configs.FlexSchedulerServiceAutoConfiguration
