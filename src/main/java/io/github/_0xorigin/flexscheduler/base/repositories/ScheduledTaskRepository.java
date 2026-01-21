@@ -38,7 +38,7 @@ public interface ScheduledTaskRepository extends JpaRepository<ScheduledTaskEnti
         LEFT JOIN FETCH t.executionLogs l
         WHERE t.isActive = true
         AND t.isExecutionFinished = false
-        AND t.taskType not in :loaders
+        AND t.taskType not in :systemTaskTypes
         AND (
             (t.typeOfExecution = 'DATETIME'
                 AND t.plannedExecutionTime >= :startDate
@@ -48,10 +48,10 @@ public interface ScheduledTaskRepository extends JpaRepository<ScheduledTaskEnti
             OR (t.typeOfExecution = 'CRON')
         )
     """)
-    List<ScheduledTaskEntity> findAllActiveTasksInDateRangeExcludeLoaders(
+    List<ScheduledTaskEntity> findAllActiveTasksInDateRangeExcludeSystemTasks(
             @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate,
-            @Param("loaders") List<String> loaders
+            @Param("systemTaskTypes") List<String> systemTaskTypes
     );
 
     List<ScheduledTaskEntity> findAllByTaskType(String taskType);

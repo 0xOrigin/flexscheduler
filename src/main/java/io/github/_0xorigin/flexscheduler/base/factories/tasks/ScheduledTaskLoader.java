@@ -30,13 +30,13 @@ public class ScheduledTaskLoader implements ScheduledTaskFactory {
     @Override
     public JsonNode performTask(JsonNode arguments) {
         TaskSchedulerOperator taskSchedulerOperator = applicationContext.getBean(TaskSchedulerOperator.class);
-        List<ScheduledTaskEntity> entityList = todayTaskFilter.getAllTodayTasksExcludeLoaders(
-            List.of(getTaskType())
+        List<ScheduledTaskEntity> tasks = todayTaskFilter.getAllTodayTasksExcludeSystemTasks(
+            List.of(TASK_TYPE, ScheduledTaskCleanup.TASK_TYPE)
         );
-        entityList.forEach(taskSchedulerOperator::scheduleTask);
+        tasks.forEach(taskSchedulerOperator::scheduleTask);
         ObjectNode result = JsonNodeUtils.createObjectNode();
         result.put("status", "success");
-        result.put("numberOfScheduledTasks", entityList.size());
+        result.put("numberOfScheduledTasks", tasks.size());
         return result;
     }
 }

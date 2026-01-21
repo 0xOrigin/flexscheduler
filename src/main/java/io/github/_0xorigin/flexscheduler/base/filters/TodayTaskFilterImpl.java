@@ -38,11 +38,11 @@ public class TodayTaskFilterImpl implements TodayTaskFilter {
     }
 
     @Override
-    public List<ScheduledTaskEntity> getAllTodayTasksExcludeLoaders(List<String> loaders) {
+    public List<ScheduledTaskEntity> getAllTodayTasksExcludeSystemTasks(List<String> systemTaskTypes) {
         OffsetDateTime now = OffsetDateTime.now();
         OffsetDateTime startOfDay = getStartOfDay(now);
         OffsetDateTime endOfDay = getEndOfDay(now);
-        return taskRepository.findAllActiveTasksInDateRangeExcludeLoaders(startOfDay, endOfDay, loaders)
+        return taskRepository.findAllActiveTasksInDateRangeExcludeSystemTasks(startOfDay, endOfDay, systemTaskTypes)
             .stream()
             .filter(task -> {
                 if (task.getTypeOfExecution() != CRON)

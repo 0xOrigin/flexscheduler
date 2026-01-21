@@ -12,7 +12,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
-@Constraint(validatedBy = {io.github._0xorigin.flexscheduler.base.validation.DurationPositiveValidator.class})
+@Constraint(validatedBy = {DurationPositiveValidator.class})
 @Target({METHOD, FIELD})
 @Retention(RUNTIME)
 public @interface DurationPositive {

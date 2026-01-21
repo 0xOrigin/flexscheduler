@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface TodayTaskFilter {
     List<ScheduledTaskEntity> getAllTodayTasks();
-    List<ScheduledTaskEntity> getAllTodayTasksExcludeLoaders(List<String> loaders);
+    List<ScheduledTaskEntity> getAllTodayTasksExcludeSystemTasks(List<String> loaders);
     boolean isDateTimeTypeAndWithInToday(ScheduledTaskEntity taskEntity, OffsetDateTime nowDateTime);
     boolean isCronTypeAndWithInToday(ScheduledTaskEntity taskEntity, OffsetDateTime nowDateTime);
     boolean isStartDateTimeAndDurationAndWithInToday(ScheduledTaskEntity taskEntity, OffsetDateTime nowDateTime);
