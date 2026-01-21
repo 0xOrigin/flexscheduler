@@ -91,7 +91,7 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
 
     private void scheduleTaskIfToday(ScheduledTaskEntity task, OffsetDateTime now) {
         if (
-            !task.getIsExecutionFinished()
+            Boolean.FALSE.equals(task.getIsExecutionFinished())
             && (
                 todayTaskFilter.isDateTimeTypeAndWithInToday(task, now)
                 || todayTaskFilter.isCronTypeAndWithInToday(task, now)
