@@ -22,7 +22,6 @@ public class ScheduledTaskCleanup implements ScheduledTaskFactory {
 
     @Override
     public JsonNode performTask(JsonNode arguments) {
-//        @Scheduled(cron = "0 0 0 1 * ?") // Every first day of the month at midnight
         long count = scheduledTaskRepository.countByIsExecutionFinishedTrue();
         if (count > 0) {
             scheduledTaskRepository.deleteByIsExecutionFinishedTrue();

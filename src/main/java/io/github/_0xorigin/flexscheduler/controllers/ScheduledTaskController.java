@@ -3,8 +3,7 @@ package io.github._0xorigin.flexscheduler.controllers;
 import io.github._0xorigin.flexscheduler.base.dtos.CreateScheduledTaskRequest;
 import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskEntity;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskRepository;
-import io.github._0xorigin.flexscheduler.services.ScheduledTaskManagementService;
-import io.github._0xorigin.flexscheduler.services.TaskSchedulerService;
+import io.github._0xorigin.flexscheduler.services.base.TaskSchedulerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,6 @@ public class ScheduledTaskController {
 
     private final TaskSchedulerService taskSchedulerService;
     private final ScheduledTaskRepository taskRepository;
-    private final ScheduledTaskManagementService managementService;
 
     @GetMapping
     public ResponseEntity<?> list(){
@@ -26,9 +24,8 @@ public class ScheduledTaskController {
 
     @PostMapping
     public ResponseEntity<?> createTask(@Valid @RequestBody CreateScheduledTaskRequest request) {
-        ScheduledTaskEntity taskEntity = managementService.createAndSave(request);
+        ScheduledTaskEntity taskEntity = taskSchedulerService.createAndSaveTask(request);
         taskSchedulerService.scheduleTaskIfExecuteToday(taskEntity);
         return ResponseEntity.ok(taskEntity);
     }
 }
-
