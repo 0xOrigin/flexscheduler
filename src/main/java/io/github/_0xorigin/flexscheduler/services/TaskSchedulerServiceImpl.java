@@ -33,18 +33,19 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
         this.schedulerOperator = taskSchedulerOperator;
     }
 
-    @Transactional
+    @Override
     public void scheduleTaskIfExecuteToday(ScheduledTaskEntity scheduledTask) {
         OffsetDateTime now = OffsetDateTime.now();
         scheduleTaskIfToday(scheduledTask, now);
     }
 
-    @Transactional
+    @Override
     public void scheduleTasksIfExecuteToday(List<ScheduledTaskEntity> scheduledTasks) {
         OffsetDateTime now = OffsetDateTime.now();
         scheduledTasks.forEach(scheduledTask -> scheduleTaskIfToday(scheduledTask, now));
     }
 
+    @Override
     @Transactional
     public ScheduledTaskEntity createAndSaveTask(CreateScheduledTaskRequest request) {
         if (request == null) {
@@ -62,6 +63,7 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
         return taskRepository.saveAndFlush(taskEntity);
     }
 
+    @Override
     @Transactional
     public List<ScheduledTaskEntity> createAndSaveTasks(List<CreateScheduledTaskRequest> requests) {
         if (requests == null) {
