@@ -1,17 +1,15 @@
-package io.github._0xorigin.flexscheduler.taskloaders;
+package io.github._0xorigin.flexscheduler.systemtaskregistries;
 
 import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskEntity;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskRepository;
-import io.github._0xorigin.flexscheduler.operators.TaskSchedulerOperator;
-import io.github._0xorigin.flexscheduler.base.factories.ScheduledTaskLoader;
+import io.github._0xorigin.flexscheduler.base.factories.tasks.ScheduledTaskLoader;
+import io.github._0xorigin.flexscheduler.base.operators.base.TaskSchedulerOperator;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @RequiredArgsConstructor
 public class TaskLoaderRegistry {
 

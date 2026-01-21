@@ -1,19 +1,18 @@
 package io.github._0xorigin.flexscheduler.services;
 
 import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskEntity;
-import io.github._0xorigin.flexscheduler.operators.TaskSchedulerOperator;
+import io.github._0xorigin.flexscheduler.base.filters.base.TodayTaskFilter;
+import io.github._0xorigin.flexscheduler.base.operators.base.TaskSchedulerOperator;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@Slf4j
 @RequiredArgsConstructor
 public class TaskSchedulerService {
 
+    private final TodayTaskFilter todayTaskFilter;
     private final TaskSchedulerOperator schedulerOperator;
 
     @Transactional
@@ -32,9 +31,9 @@ public class TaskSchedulerService {
         if (
             !scheduledTask.getIsExecutionFinished()
             && (
-                schedulerOperator.isDateTimeTypeAndWithInToday(scheduledTask, now)
-                || schedulerOperator.isCronTypeAndWithInToday(scheduledTask, now)
-                || schedulerOperator.isStartDateTimeAndDurationAndWithInToday(scheduledTask, now)
+                todayTaskFilter.isDateTimeTypeAndWithInToday(scheduledTask, now)
+                || todayTaskFilter.isCronTypeAndWithInToday(scheduledTask, now)
+                || todayTaskFilter.isStartDateTimeAndDurationAndWithInToday(scheduledTask, now)
             )
         )
             schedulerOperator.scheduleTask(scheduledTask);

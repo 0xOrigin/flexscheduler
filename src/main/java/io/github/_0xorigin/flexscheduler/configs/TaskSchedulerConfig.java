@@ -11,7 +11,7 @@ public class TaskSchedulerConfig {
     @Bean
     public TaskScheduler taskScheduler(SimpleAsyncTaskSchedulerBuilder builder) {
         return builder
-            .threadNamePrefix("[FlexScheduler]")
+            .threadNamePrefix("FlexScheduler-")
             .virtualThreads(true)
             .concurrencyLimit(1000)
             .build();

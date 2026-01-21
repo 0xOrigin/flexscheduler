@@ -1,17 +1,18 @@
-package io.github._0xorigin.flexscheduler.services.mappers;
+package io.github._0xorigin.flexscheduler.base.factories.mappers;
 
 import io.github._0xorigin.flexscheduler.base.dtos.CreateScheduledTaskRequest;
 import io.github._0xorigin.flexscheduler.base.dtos.DateTimeScheduledTaskRequest;
 import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskEntity;
+import io.github._0xorigin.flexscheduler.base.factories.mappers.base.CreateToEntityMapperFactory;
 import io.github._0xorigin.flexscheduler.base.mappers.ScheduledTaskMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
-public class DateTimeCreateToEntityMapper implements CreateToEntityMapper {
+public class DateTimeCreateToEntityMapper implements CreateToEntityMapperFactory {
 
     private final ScheduledTaskMapper mapper;
+
+    public DateTimeCreateToEntityMapper(ScheduledTaskMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @Override
     public boolean supports(Class<?> requestType) {

@@ -2,21 +2,25 @@ package io.github._0xorigin.flexscheduler.configs;
 
 import io.github._0xorigin.flexscheduler.base.executors.ScheduledTaskExecutorImpl;
 import io.github._0xorigin.flexscheduler.base.executors.base.ScheduledTaskExecutor;
-import io.github._0xorigin.flexscheduler.base.factories.base.ScheduledTaskFactory;
+import io.github._0xorigin.flexscheduler.base.factories.tasks.ScheduledTaskCleanup;
+import io.github._0xorigin.flexscheduler.base.factories.tasks.base.ScheduledTaskFactory;
+import io.github._0xorigin.flexscheduler.base.filters.TodayTaskFilterImpl;
+import io.github._0xorigin.flexscheduler.base.filters.base.TodayTaskFilter;
 import io.github._0xorigin.flexscheduler.base.mappers.ScheduledTaskMapper;
 import io.github._0xorigin.flexscheduler.base.mappers.ScheduledTaskMapperImpl;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskExecutionLogRepository;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskRepository;
 import io.github._0xorigin.flexscheduler.controllers.ScheduledTaskController;
-import io.github._0xorigin.flexscheduler.operators.TaskSchedulerOperator;
+import io.github._0xorigin.flexscheduler.base.operators.TaskSchedulerOperatorImpl;
+import io.github._0xorigin.flexscheduler.base.operators.base.TaskSchedulerOperator;
 import io.github._0xorigin.flexscheduler.services.ScheduledTaskManagementService;
 import io.github._0xorigin.flexscheduler.services.TaskSchedulerService;
-import io.github._0xorigin.flexscheduler.taskloaders.TaskLoaderRegistry;
-import io.github._0xorigin.flexscheduler.base.factories.ScheduledTaskLoader;
-import io.github._0xorigin.flexscheduler.services.mappers.CronCreateToEntityMapper;
-import io.github._0xorigin.flexscheduler.services.mappers.DateTimeCreateToEntityMapper;
-import io.github._0xorigin.flexscheduler.services.mappers.StartTimeDurationCreateToEntityMapper;
-import io.github._0xorigin.flexscheduler.services.mappers.CreateToEntityMapper;
+import io.github._0xorigin.flexscheduler.systemtaskregistries.TaskLoaderRegistry;
+import io.github._0xorigin.flexscheduler.base.factories.tasks.ScheduledTaskLoader;
+import io.github._0xorigin.flexscheduler.base.factories.mappers.CronCreateToEntityMapper;
+import io.github._0xorigin.flexscheduler.base.factories.mappers.DateTimeCreateToEntityMapper;
+import io.github._0xorigin.flexscheduler.base.factories.mappers.StartTimeDurationCreateToEntityMapper;
+import io.github._0xorigin.flexscheduler.base.factories.mappers.base.CreateToEntityMapperFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +33,11 @@ public class FlexSchedulerServiceAutoConfiguration {
 
     @Bean ScheduledTaskMapper scheduledTaskMapper() {
         return new ScheduledTaskMapperImpl();
+    }
+
+    @Bean
+    public TodayTaskFilter todayTaskFilter(ScheduledTaskRepository taskRepository) {
+        return new TodayTaskFilterImpl(taskRepository);
     }
 
     @Bean
@@ -64,8 +73,13 @@ public class FlexSchedulerServiceAutoConfiguration {
     }
 
     @Bean
-    public ScheduledTaskLoader scheduledTaskLoader(ApplicationContext applicationContext) {
-        return new ScheduledTaskLoader(applicationContext);
+    public ScheduledTaskLoader scheduledTaskLoader(ApplicationContext applicationContext, TodayTaskFilter todayTaskFilter) {
+        return new ScheduledTaskLoader(applicationContext, todayTaskFilter);
+    }
+
+    @Bean
+    public ScheduledTaskCleanup scheduledTaskCleanup(ScheduledTaskRepository scheduledTaskRepository) {
+        return new ScheduledTaskCleanup(scheduledTaskRepository);
     }
 
     @Bean
@@ -81,20 +95,20 @@ public class FlexSchedulerServiceAutoConfiguration {
     public TaskSchedulerOperator taskSchedulerOperator(
         TaskScheduler scheduler,
         ScheduledTaskExecutor scheduledTaskExecutor,
-        ScheduledTaskRepository taskRepository,
+        TodayTaskFilter todayTaskFilter,
         List<ScheduledTaskFactory> factories
     ) {
-        return new TaskSchedulerOperator(scheduler, scheduledTaskExecutor, taskRepository, factories);
+        return new TaskSchedulerOperatorImpl(scheduler, scheduledTaskExecutor, todayTaskFilter, factories);
     }
 
     @Bean
-    public TaskSchedulerService taskSchedulerService(TaskSchedulerOperator taskSchedulerOperator) {
-        return new TaskSchedulerService(taskSchedulerOperator);
+    public TaskSchedulerService taskSchedulerService(TodayTaskFilter todayTaskFilter, TaskSchedulerOperator taskSchedulerOperator) {
+        return new TaskSchedulerService(todayTaskFilter, taskSchedulerOperator);
     }
 
     @Bean
     public ScheduledTaskManagementService scheduledTaskManagementService(
-        List<CreateToEntityMapper> mappers,
+        List<CreateToEntityMapperFactory> mappers,
         ScheduledTaskRepository taskRepository
     ) {
         return new ScheduledTaskManagementService(mappers, taskRepository);

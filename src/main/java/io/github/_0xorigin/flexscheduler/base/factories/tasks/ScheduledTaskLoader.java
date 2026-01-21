@@ -1,10 +1,11 @@
-package io.github._0xorigin.flexscheduler.base.factories;
+package io.github._0xorigin.flexscheduler.base.factories.tasks;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskEntity;
-import io.github._0xorigin.flexscheduler.base.factories.base.ScheduledTaskFactory;
-import io.github._0xorigin.flexscheduler.operators.TaskSchedulerOperator;
+import io.github._0xorigin.flexscheduler.base.factories.tasks.base.ScheduledTaskFactory;
+import io.github._0xorigin.flexscheduler.base.filters.base.TodayTaskFilter;
+import io.github._0xorigin.flexscheduler.base.operators.base.TaskSchedulerOperator;
 import io.github._0xorigin.flexscheduler.utils.JsonNodeUtils;
 import org.springframework.context.ApplicationContext;
 
@@ -12,11 +13,13 @@ import java.util.List;
 
 public class ScheduledTaskLoader implements ScheduledTaskFactory {
 
-    public static final String TASK_TYPE = "Tasks24HoursLoader";
+    public static final String TASK_TYPE = "SYS-ScheduledTaskLoader";
     private final ApplicationContext applicationContext;
+    private final TodayTaskFilter todayTaskFilter;
 
-    public ScheduledTaskLoader(ApplicationContext applicationContext) {
+    public ScheduledTaskLoader(ApplicationContext applicationContext, TodayTaskFilter todayTaskFilter) {
         this.applicationContext = applicationContext;
+        this.todayTaskFilter = todayTaskFilter;
     }
 
     @Override
@@ -27,7 +30,7 @@ public class ScheduledTaskLoader implements ScheduledTaskFactory {
     @Override
     public JsonNode performTask(JsonNode arguments) {
         TaskSchedulerOperator taskSchedulerOperator = applicationContext.getBean(TaskSchedulerOperator.class);
-        List<ScheduledTaskEntity> entityList = taskSchedulerOperator.getAllTodayTasksExcludeLoaders(
+        List<ScheduledTaskEntity> entityList = todayTaskFilter.getAllTodayTasksExcludeLoaders(
             List.of(getTaskType())
         );
         entityList.forEach(taskSchedulerOperator::scheduleTask);

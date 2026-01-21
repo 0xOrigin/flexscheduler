@@ -6,7 +6,7 @@ import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskExecutionLog
 import io.github._0xorigin.flexscheduler.base.enums.ScheduledTaskExecutionStatus;
 import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
 import io.github._0xorigin.flexscheduler.base.executors.base.ScheduledTaskExecutor;
-import io.github._0xorigin.flexscheduler.base.factories.base.ScheduledTaskFactory;
+import io.github._0xorigin.flexscheduler.base.factories.tasks.base.ScheduledTaskFactory;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskExecutionLogRepository;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskRepository;
 import io.github._0xorigin.flexscheduler.utils.JsonNodeUtils;
@@ -19,7 +19,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class ScheduledTaskExecutorImpl implements ScheduledTaskExecutor {
-
     private static final String TASK_ID_NOT_NULL_MESSAGE = "taskId must be not null";
     private final Logger log = LoggerFactory.getLogger("ScheduledTaskExecutor");
     private final ScheduledTaskRepository taskRepository;

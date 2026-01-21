@@ -1,4 +1,4 @@
-package io.github._0xorigin.flexscheduler.base.factories.base;
+package io.github._0xorigin.flexscheduler.base.factories.tasks.base;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
