@@ -7,6 +7,7 @@ import io.github._0xorigin.flexscheduler.base.filters.TodayTaskFilterImpl;
 import io.github._0xorigin.flexscheduler.base.filters.base.TodayTaskFilter;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskExecutionLogRepository;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskRepository;
+import io.github._0xorigin.flexscheduler.base.validation.ValidTaskTypeValidator;
 import io.github._0xorigin.flexscheduler.controllers.ScheduledTaskController;
 import io.github._0xorigin.flexscheduler.base.operators.TaskSchedulerOperatorImpl;
 import io.github._0xorigin.flexscheduler.base.operators.base.TaskSchedulerOperator;
@@ -72,5 +73,10 @@ public class FlexSchedulerServiceAutoConfiguration {
         ScheduledTaskRepository taskRepository
     ) {
         return new ScheduledTaskController(taskSchedulerService, taskRepository);
+    }
+
+    @Bean
+    public ValidTaskTypeValidator validTaskTypeValidator(TaskSchedulerOperator taskSchedulerOperator) {
+        return new ValidTaskTypeValidator(taskSchedulerOperator);
     }
 }

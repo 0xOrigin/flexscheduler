@@ -9,6 +9,8 @@ import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskReposito
 import io.github._0xorigin.flexscheduler.services.base.TaskSchedulerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
@@ -52,6 +54,9 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
             return null;
         }
 
+        // Validate that the provided taskType exists in the operator's factory set
+        validateTaskType(request);
+
         CreateToEntityMapperFactory mapper = mappers.stream()
             .filter(m -> m.supports(request.getClass()))
             .findFirst()
@@ -71,6 +76,9 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
 
         List<ScheduledTaskEntity> tasks =  requests.stream()
             .map(request -> {
+                // Validate each request's taskType
+                validateTaskType(request);
+
                 CreateToEntityMapperFactory mapper = mappers.stream()
                     .filter(m -> m.supports(request.getClass()))
                     .findFirst()
@@ -83,6 +91,15 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
             .toList();
 
         return taskRepository.saveAllAndFlush(tasks);
+    }
+
+    private void validateTaskType(CreateScheduledTaskRequest request) {
+        if (request == null)
+            return;
+        String taskType = request.getTaskType();
+        if (taskType == null || !schedulerOperator.getFactorySet().contains(taskType)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown taskType: " + taskType);
+        }
     }
 
     private void setDefaultFields(ScheduledTaskEntity task) {

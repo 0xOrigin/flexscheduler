@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import io.github._0xorigin.flexscheduler.base.validation.ValidTaskType;
 
 import java.time.OffsetDateTime;
 
@@ -20,6 +21,7 @@ import java.time.OffsetDateTime;
         @JsonSubTypes.Type(value = DateTimeScheduledTaskRequest.class, name = "DATETIME"),
         @JsonSubTypes.Type(value = StartTimeDurationScheduledTaskRequest.class, name = "START_TIME_AND_DURATION")
 })
+@ValidTaskType
 public abstract class CreateScheduledTaskRequest {
     @NotBlank
     protected String name;
