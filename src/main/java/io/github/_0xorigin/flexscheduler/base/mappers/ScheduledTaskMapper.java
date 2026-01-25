@@ -6,6 +6,8 @@ import io.github._0xorigin.flexscheduler.base.dtos.CronScheduledTaskRequest;
 import io.github._0xorigin.flexscheduler.base.dtos.DateTimeScheduledTaskRequest;
 import io.github._0xorigin.flexscheduler.base.dtos.StartTimeDurationScheduledTaskRequest;
 import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskEntity;
+import io.github._0xorigin.flexscheduler.dtos.ScheduledTaskListResponse;
+import io.github._0xorigin.flexscheduler.dtos.ScheduledTaskRetrieveResponse;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -41,6 +43,12 @@ public interface ScheduledTaskMapper {
     List<DateTimeScheduledTaskRequest> entitiesToDateTimeTaskRequests(List<ScheduledTaskEntity> entityList);
 
     List<StartTimeDurationScheduledTaskRequest> entitiesToStartTimeDurationTaskRequests(List<ScheduledTaskEntity> entityList);
+
+    ScheduledTaskListResponse entityToListResponse(ScheduledTaskEntity entity);
+
+    List<ScheduledTaskListResponse> entitiesToListResponses(List<ScheduledTaskEntity> entities);
+
+    ScheduledTaskRetrieveResponse entityToRetrieveResponse(ScheduledTaskEntity entity);
 
     @Named("jsonNodeHandleNull")
     default JsonNode jsonNodeHandleNull(JsonNode arguments) {

@@ -50,7 +50,7 @@ public class SystemTaskRegistry {
                 .cronExpression("0 0 0 * * *") // Every day at midnight
                 .isActive(true)
                 .build();
-        ScheduledTaskEntity task = taskSchedulerService.createAndSaveTask(scheduledTaskRequest);
+        ScheduledTaskEntity task = taskSchedulerService.createTaskInstance(scheduledTaskRequest);
         taskSchedulerOperator.scheduleTask(task);
     }
 
@@ -64,7 +64,7 @@ public class SystemTaskRegistry {
             .cronExpression("0 0 0 1 * ?") // Every first day of the month at midnight
             .isActive(true)
             .build();
-        ScheduledTaskEntity task = taskSchedulerService.createAndSaveTask(scheduledTaskRequest);
+        ScheduledTaskEntity task = taskSchedulerService.createTaskInstance(scheduledTaskRequest);
         taskSchedulerOperator.scheduleTask(task);
     }
 

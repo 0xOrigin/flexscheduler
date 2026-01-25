@@ -90,14 +90,20 @@ public class TaskSchedulerOperatorImpl implements TaskSchedulerOperator {
     @Override
     public void cancelTask(UUID taskId) {
         scheduledFutures.computeIfPresent(taskId, (id, future) -> {
+            boolean isCanceled = false;
             try {
-                future.cancel(false);
+                isCanceled = future.cancel(false);
             } catch (Exception e) {
                 log.warn("Failed to cancel task {}", id, e);
             }
+            if (!isCanceled) {
+                log.warn("Failed to cancel task {}", id);
+                return future;
+            }
             log.info("Cancelled scheduled task ID: {}", taskId);
-            return null;
+            return future;
         });
+        scheduledFutures.remove(taskId);
     }
 
     @Override
@@ -108,7 +114,10 @@ public class TaskSchedulerOperatorImpl implements TaskSchedulerOperator {
     }
 
     private Runnable createRunnableInstance(final ScheduledTaskEntity task, final ScheduledTaskFactory factory) {
-       return () -> scheduledTaskExecutor.executeTask(task.getId(), factory);
+       return () -> {
+           scheduledTaskExecutor.executeTask(task.getId(), factory);
+           scheduledFutures.remove(task.getId());
+       };
     }
 
     private void cancelPreviousFutureIfExists(ScheduledFuture<?> prev, UUID taskId) {

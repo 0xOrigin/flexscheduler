@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 2026-01-20-create-scheduled-tasks-and-execution-logs
+      id: create-scheduled-tasks-and-execution-logs
       author: system
       changes:
         # Create scheduled_tasks table
@@ -45,6 +45,9 @@ databaseChangeLog:
                   type: BIGINT
                   remarks: Stored as milliseconds (converted by DurationAttributeConverter)
               - column:
+                  name: next_execution_time
+                  type: TIMESTAMPTZ
+              - column:
                   name: arguments
                   type: JSONB
                   remarks: PostgreSQL JSONB column for flexible arguments
@@ -65,6 +68,21 @@ databaseChangeLog:
                   type: TIMESTAMPTZ
                   constraints:
                     nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: true
+              - column:
+                  name: claimed_by
+                  type: VARCHAR(255)
+              - column:
+                  name: last_claimed_at
+                  type: TIMESTAMPTZ
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValue: 0
 
         # Add all indexes for scheduled_tasks
         - createIndex:
@@ -133,6 +151,30 @@ databaseChangeLog:
                   name: type_of_execution
               - column:
                   name: is_execution_finished
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduler_stale_recovery
+            columns:
+              - column:
+                  name: last_claimed_at
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduler_pod_ownership
+            columns:
+              - column:
+                  name: claimed_by
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduler_claim_lookup
+            columns:
+              - column:
+                  name: is_active
+              - column:
+                  name: is_execution_finished
+              - column:
+                  name: next_execution_time
+              - column:
+                  name: claimed_by
 
         # Create scheduled_task_execution_logs table
         - createTable:

@@ -1,0 +1,31 @@
+package io.github._0xorigin.flexscheduler.dtos;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
+import lombok.Builder;
+
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.util.UUID;
+
+@Builder
+public record ScheduledTaskListResponse(
+    UUID id,
+    String name,
+    String description,
+    String taskType,
+    TaskExecutionType typeOfExecution,
+    String cronExpression,
+    OffsetDateTime plannedExecutionTime,
+    OffsetDateTime startDateTime,
+    Duration duration,
+    OffsetDateTime nextExecutionTime,
+    JsonNode arguments,
+    Boolean isActive,
+    Boolean isExecutionFinished,
+    OffsetDateTime createdAt,
+    OffsetDateTime updatedAt,
+    String claimedBy,
+    OffsetDateTime lastClaimedAt,
+    Long version
+) {}
