@@ -23,6 +23,7 @@ public class FlexSchedulerEnvironmentPostProcessor implements EnvironmentPostPro
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> defaultProperties = new LinkedHashMap<>();
+        defaultProperties.put("flexscheduler.liquibase.enabled", true);
 
         MapPropertySource propertySource = new MapPropertySource("flexscheduler", defaultProperties);
         environment.getPropertySources().addLast(propertySource);

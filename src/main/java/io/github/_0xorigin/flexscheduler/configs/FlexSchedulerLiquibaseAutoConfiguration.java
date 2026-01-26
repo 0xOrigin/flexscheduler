@@ -18,7 +18,7 @@ public class FlexSchedulerLiquibaseAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "flexSchedulerLiquibase")
-    @ConditionalOnProperty(prefix = "flexscheduler.liquibase", name = "enabled", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = "flexscheduler.liquibase", name = "enabled", havingValue = "true", matchIfMissing = true)
     public SpringLiquibase flexSchedulerLiquibase(DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource);
