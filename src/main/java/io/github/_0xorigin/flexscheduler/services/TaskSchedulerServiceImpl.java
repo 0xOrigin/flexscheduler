@@ -16,15 +16,19 @@ import io.github._0xorigin.queryfilterbuilder.FilterContext;
 import io.github._0xorigin.queryfilterbuilder.QueryFilterBuilder;
 import io.github._0xorigin.queryfilterbuilder.SortContext;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
+@Validated
 public class TaskSchedulerServiceImpl implements TaskSchedulerService {
     private static final Logger log = LoggerFactory.getLogger("TaskSchedulerService");
     private final List<CreateToEntityMapperFactory> mappers;
@@ -69,26 +73,22 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
     }
 
     @Override
-    public ScheduledTaskEntity createTaskInstance(CreateScheduledTaskRequest request) {
-        if (request == null) {
-            log.info("Task request is null");
-            return null;
-        }
-
+    public ScheduledTaskEntity createTaskInstance(@Valid CreateScheduledTaskRequest request) {
+        Objects.requireNonNull(request);
         ScheduledTaskEntity taskEntity = mapRequestToEntityAndSetDefaults(request);
         return taskRepository.saveAndFlush(taskEntity);
     }
 
     @Override
     @Transactional
-    public ScheduledTaskRetrieveResponse createTask(CreateScheduledTaskRequest request) {
+    public ScheduledTaskRetrieveResponse createTask(@Valid CreateScheduledTaskRequest request) {
         ScheduledTaskEntity taskEntity = createTaskInstance(request);
         return taskMapper.entityToRetrieveResponse(taskEntity);
     }
 
     @Override
     @Transactional
-    public ScheduledTaskRetrieveResponse createTaskAndSchedule(CreateScheduledTaskRequest request) {
+    public ScheduledTaskRetrieveResponse createTaskAndSchedule(@Valid CreateScheduledTaskRequest request) {
         ScheduledTaskEntity taskEntity = createTaskInstance(request);
         scheduleTaskIfExecuteToday(taskEntity);
         return taskMapper.entityToRetrieveResponse(taskEntity);
@@ -96,14 +96,14 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
 
     @Override
     @Transactional
-    public List<ScheduledTaskListResponse> createTasks(List<CreateScheduledTaskRequest> requests) {
+    public List<ScheduledTaskListResponse> createTasks(List<@Valid CreateScheduledTaskRequest> requests) {
         List<ScheduledTaskEntity> tasks = createTasksInstances(requests);
         return taskMapper.entitiesToListResponses(tasks);
     }
 
     @Override
     @Transactional
-    public List<ScheduledTaskListResponse> createTasksAndSchedule(List<CreateScheduledTaskRequest> requests) {
+    public List<ScheduledTaskListResponse> createTasksAndSchedule(List<@Valid CreateScheduledTaskRequest> requests) {
         List<ScheduledTaskEntity> tasks = createTasksInstances(requests);
         scheduleTasksIfExecuteToday(tasks);
         return taskMapper.entitiesToListResponses(tasks);
@@ -164,11 +164,7 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
     }
 
     private List<ScheduledTaskEntity> createTasksInstances(List<CreateScheduledTaskRequest> requests) {
-        if (requests == null) {
-            log.info("Task requests are null");
-            return List.of();
-        }
-
+        Objects.requireNonNull(requests);
         List<ScheduledTaskEntity> tasks = requests.stream()
                 .map(this::mapRequestToEntityAndSetDefaults)
                 .toList();

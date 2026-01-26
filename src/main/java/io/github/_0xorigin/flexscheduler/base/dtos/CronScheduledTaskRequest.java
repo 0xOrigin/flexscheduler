@@ -2,7 +2,7 @@ package io.github._0xorigin.flexscheduler.base.dtos;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
-import jakarta.validation.constraints.AssertTrue;
+import io.github._0xorigin.flexscheduler.base.validation.ValidCronExpression;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,6 +14,7 @@ import java.time.OffsetDateTime;
 public class CronScheduledTaskRequest extends CreateScheduledTaskRequest {
 
     @NotBlank
+    @ValidCronExpression
     private String cronExpression;
 
     public CronScheduledTaskRequest() {
@@ -33,11 +34,6 @@ public class CronScheduledTaskRequest extends CreateScheduledTaskRequest {
             builder.endExecutionTime
         );
         this.cronExpression = builder.cronExpression;
-    }
-
-    @AssertTrue(message = "cronExpression must be not blank when typeOfExecution is CRON")
-    public boolean isCronExpressionValid() {
-        return typeOfExecution != TaskExecutionType.CRON || (cronExpression != null && !cronExpression.isBlank());
     }
 
     public static Builder builder() {

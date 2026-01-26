@@ -12,11 +12,11 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
-@Constraint(validatedBy = {CronExpressionValidator.class})
+@Constraint(validatedBy = {ValidCronExpressionValidator.class})
 @Target({METHOD, FIELD})
 @Retention(RUNTIME)
-public @interface CronExpression {
-    String message() default "must be a valid cron expression (5-7 fields)";
+public @interface ValidCronExpression {
+    String message() default "cronExpression must contain valid 6 fields";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

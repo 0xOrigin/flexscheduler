@@ -2,6 +2,7 @@ package io.github._0xorigin.flexscheduler.base.dtos;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
+import io.github._0xorigin.flexscheduler.base.validation.DurationPositive;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,7 @@ public class StartTimeDurationScheduledTaskRequest extends CreateScheduledTaskRe
     private OffsetDateTime startDateTime;
 
     @NotNull
+    @DurationPositive
     private Duration duration;
 
     public StartTimeDurationScheduledTaskRequest() {

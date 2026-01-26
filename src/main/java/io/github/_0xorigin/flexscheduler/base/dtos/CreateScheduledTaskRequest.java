@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import io.github._0xorigin.flexscheduler.base.validation.ValidTaskType;
 
@@ -34,6 +35,7 @@ public abstract class CreateScheduledTaskRequest {
     protected Boolean isActive;
     protected OffsetDateTime createdAt;
     protected String description;
+    @NotNull
     protected Boolean hasEnd;
     protected OffsetDateTime endExecutionTime;
 

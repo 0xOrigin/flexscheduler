@@ -23,6 +23,8 @@ public record ScheduledTaskRetrieveResponse(
     JsonNode arguments,
     Boolean isActive,
     Boolean isExecutionFinished,
+    Boolean hasEnd,
+    OffsetDateTime endExecutionTime,
     OffsetDateTime createdAt,
     OffsetDateTime updatedAt,
     String claimedBy,

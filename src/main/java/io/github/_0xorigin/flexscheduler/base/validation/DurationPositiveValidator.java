@@ -9,7 +9,7 @@ public class DurationPositiveValidator implements ConstraintValidator<DurationPo
 
     @Override
     public boolean isValid(Duration value, ConstraintValidatorContext context) {
-        if (value == null) return true; // presence enforced by ExecutionTypeConsistency
+        if (value == null) return true;
         try {
             return !value.isZero() && value.compareTo(Duration.ZERO) > 0;
         } catch (Exception e) {

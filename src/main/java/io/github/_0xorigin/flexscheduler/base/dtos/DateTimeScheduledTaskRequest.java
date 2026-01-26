@@ -3,7 +3,6 @@ package io.github._0xorigin.flexscheduler.base.dtos;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,7 +22,6 @@ public class DateTimeScheduledTaskRequest extends CreateScheduledTaskRequest {
         this.hasEnd = true;
     }
 
-    // If client provides hasEnd in JSON, ignore it and always set true for DATETIME
     @JsonSetter("hasEnd")
     public void setHasEndForDatetime(Boolean ignored) {
         this.hasEnd = true;
