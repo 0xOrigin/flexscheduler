@@ -1,8 +1,8 @@
 package io.github._0xorigin.flexscheduler.controllers;
 
 import io.github._0xorigin.flexscheduler.base.dtos.CreateScheduledTaskRequest;
-import io.github._0xorigin.flexscheduler.dtos.ScheduledTaskListResponse;
-import io.github._0xorigin.flexscheduler.dtos.ScheduledTaskRetrieveResponse;
+import io.github._0xorigin.flexscheduler.dtos.responses.ScheduledTaskListResponse;
+import io.github._0xorigin.flexscheduler.dtos.responses.ScheduledTaskRetrieveResponse;
 import io.github._0xorigin.flexscheduler.services.base.TaskSchedulerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

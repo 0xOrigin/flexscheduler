@@ -1,4 +1,4 @@
-package io.github._0xorigin.flexscheduler.dtos;
+package io.github._0xorigin.flexscheduler.dtos.responses;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Builder
-public record ScheduledTaskListResponse(
+public record ScheduledTaskRetrieveResponse(
     UUID id,
     String name,
     String description,

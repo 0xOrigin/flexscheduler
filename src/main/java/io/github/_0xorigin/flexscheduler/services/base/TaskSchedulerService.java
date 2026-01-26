@@ -2,8 +2,8 @@ package io.github._0xorigin.flexscheduler.services.base;
 
 import io.github._0xorigin.flexscheduler.base.dtos.CreateScheduledTaskRequest;
 import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskEntity;
-import io.github._0xorigin.flexscheduler.dtos.ScheduledTaskListResponse;
-import io.github._0xorigin.flexscheduler.dtos.ScheduledTaskRetrieveResponse;
+import io.github._0xorigin.flexscheduler.dtos.responses.ScheduledTaskListResponse;
+import io.github._0xorigin.flexscheduler.dtos.responses.ScheduledTaskRetrieveResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;

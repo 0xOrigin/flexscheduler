@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 public class ScheduledTaskExecutorImpl implements ScheduledTaskExecutor {
@@ -37,12 +38,12 @@ public class ScheduledTaskExecutorImpl implements ScheduledTaskExecutor {
 
     @Override
     @Transactional
-    public void executeTask(UUID taskId, ScheduledTaskFactory factory) {
+    public Optional<ScheduledTaskEntity> executeTask(UUID taskId, ScheduledTaskFactory factory) {
         ScheduledTaskEntity task = getScheduledTaskInstance(taskId);
 
         if (isTaskInactive(task)) {
             log.info("Task [{}] - [{}] '{}' InActive - Skipping the execution", task.getId(), task.getTaskType(), task.getName());
-            return;
+            return Optional.empty();
         }
 
         ScheduledTaskExecutionLogEntity execution = createExecutionLogInstance(task);
@@ -56,8 +57,9 @@ public class ScheduledTaskExecutorImpl implements ScheduledTaskExecutor {
         } catch (Exception exception) {
             handleTaskFailure(task, execution, exception);
         } finally {
-            finalizeTaskExecution(task, execution);
+            task = finalizeTaskExecution(task, execution);
         }
+        return Optional.of(task);
     }
 
     private ScheduledTaskEntity getScheduledTaskInstance(UUID taskId) {
@@ -91,12 +93,12 @@ public class ScheduledTaskExecutorImpl implements ScheduledTaskExecutor {
         logExecutionFailure(task);
     }
 
-    private void finalizeTaskExecution(ScheduledTaskEntity task, ScheduledTaskExecutionLogEntity execution) {
+    private ScheduledTaskEntity finalizeTaskExecution(ScheduledTaskEntity task, ScheduledTaskExecutionLogEntity execution) {
         OffsetDateTime now = OffsetDateTime.now();
         execution.setFinishedAt(now);
         saveExecutionLog(execution);
         nextExecutionService.computeAndSetNextExecutionFieldsAfterTaskExecution(task, now);
-        saveTask(task);
+        return saveTask(task);
     }
 
     private ScheduledTaskEntity saveTask(ScheduledTaskEntity task) {

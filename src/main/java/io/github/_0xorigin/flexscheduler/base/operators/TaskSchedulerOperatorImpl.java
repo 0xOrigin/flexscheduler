@@ -65,7 +65,7 @@ public class TaskSchedulerOperatorImpl implements TaskSchedulerOperator {
             return;
         }
 
-        Runnable runnable = createRunnableInstance(task, factory);
+        Runnable runnable = createRunnableInstance(task.getId(), factory);
 
         scheduledFutures.compute(task.getId(), (id, prev) -> computeAndScheduleFuture(id, prev, task, runnable));
     }
@@ -113,10 +113,15 @@ public class TaskSchedulerOperatorImpl implements TaskSchedulerOperator {
         scheduledFutures.values().forEach(future -> future.cancel(false));
     }
 
-    private Runnable createRunnableInstance(final ScheduledTaskEntity task, final ScheduledTaskFactory factory) {
+    private Runnable createRunnableInstance(final UUID taskId, final ScheduledTaskFactory factory) {
        return () -> {
-           scheduledTaskExecutor.executeTask(task.getId(), factory);
-           scheduledFutures.remove(task.getId());
+           Optional<ScheduledTaskEntity> task = scheduledTaskExecutor.executeTask(taskId, factory);
+           task.ifPresent(instance -> {
+               if (Boolean.TRUE.equals(instance.getIsExecutionFinished())) {
+                   scheduledFutures.get(instance.getId()).cancel(false);
+                   scheduledFutures.remove(instance.getId());
+               }
+           });
        };
     }
 

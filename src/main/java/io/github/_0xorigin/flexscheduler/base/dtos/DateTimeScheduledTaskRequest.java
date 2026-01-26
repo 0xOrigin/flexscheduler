@@ -17,7 +17,6 @@ public class DateTimeScheduledTaskRequest extends CreateScheduledTaskRequest {
     private OffsetDateTime plannedExecutionTime;
 
     public DateTimeScheduledTaskRequest() {
-        super();
         this.typeOfExecution = TaskExecutionType.DATETIME;
         this.hasEnd = true;
     }
@@ -25,6 +24,20 @@ public class DateTimeScheduledTaskRequest extends CreateScheduledTaskRequest {
     @JsonSetter("hasEnd")
     public void setHasEndForDatetime(Boolean ignored) {
         this.hasEnd = true;
+    }
+
+    @JsonSetter("plannedExecutionTime")
+    public void setPlannedExecutionTime(OffsetDateTime plannedExecutionTime) {
+        this.plannedExecutionTime = plannedExecutionTime;
+        this.endExecutionTime = plannedExecutionTime;
+    }
+
+    @Override
+    @JsonSetter("endExecutionTime")
+    public void setEndExecutionTime(OffsetDateTime ignored) {
+        if (this.plannedExecutionTime != null) {
+            this.endExecutionTime = this.plannedExecutionTime;
+        }
     }
 
     public DateTimeScheduledTaskRequest(Builder builder) {

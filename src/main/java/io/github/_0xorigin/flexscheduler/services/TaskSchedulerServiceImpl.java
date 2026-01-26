@@ -8,8 +8,8 @@ import io.github._0xorigin.flexscheduler.base.mappers.ScheduledTaskMapper;
 import io.github._0xorigin.flexscheduler.base.operators.base.TaskSchedulerOperator;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskRepository;
 import io.github._0xorigin.flexscheduler.base.services.base.NextExecutionService;
-import io.github._0xorigin.flexscheduler.dtos.ScheduledTaskListResponse;
-import io.github._0xorigin.flexscheduler.dtos.ScheduledTaskRetrieveResponse;
+import io.github._0xorigin.flexscheduler.dtos.responses.ScheduledTaskListResponse;
+import io.github._0xorigin.flexscheduler.dtos.responses.ScheduledTaskRetrieveResponse;
 import io.github._0xorigin.flexscheduler.services.base.TaskSchedulerService;
 import io.github._0xorigin.flexscheduler.specifications.base.ScheduledTaskSpecification;
 import io.github._0xorigin.queryfilterbuilder.FilterContext;
@@ -17,8 +17,6 @@ import io.github._0xorigin.queryfilterbuilder.QueryFilterBuilder;
 import io.github._0xorigin.queryfilterbuilder.SortContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -30,7 +28,6 @@ import java.util.UUID;
 
 @Validated
 public class TaskSchedulerServiceImpl implements TaskSchedulerService {
-    private static final Logger log = LoggerFactory.getLogger("TaskSchedulerService");
     private final List<CreateToEntityMapperFactory> mappers;
     private final ScheduledTaskRepository taskRepository;
     private final ScheduledTaskMapper taskMapper;

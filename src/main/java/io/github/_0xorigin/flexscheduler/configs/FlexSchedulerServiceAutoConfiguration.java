@@ -1,11 +1,13 @@
 package io.github._0xorigin.flexscheduler.configs;
 
 import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskEntity;
+import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskExecutionLogEntity;
 import io.github._0xorigin.flexscheduler.base.executors.ScheduledTaskExecutorImpl;
 import io.github._0xorigin.flexscheduler.base.executors.base.ScheduledTaskExecutor;
 import io.github._0xorigin.flexscheduler.base.factories.tasks.base.ScheduledTaskFactory;
 import io.github._0xorigin.flexscheduler.base.filters.TodayTaskFilterImpl;
 import io.github._0xorigin.flexscheduler.base.filters.base.TodayTaskFilter;
+import io.github._0xorigin.flexscheduler.base.mappers.ScheduledTaskExecutionLogMapper;
 import io.github._0xorigin.flexscheduler.base.mappers.ScheduledTaskMapper;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskExecutionLogRepository;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskRepository;
@@ -15,7 +17,10 @@ import io.github._0xorigin.flexscheduler.base.validation.ValidTaskTypeValidator;
 import io.github._0xorigin.flexscheduler.controllers.ScheduledTaskController;
 import io.github._0xorigin.flexscheduler.base.operators.TaskSchedulerOperatorImpl;
 import io.github._0xorigin.flexscheduler.base.operators.base.TaskSchedulerOperator;
+import io.github._0xorigin.flexscheduler.controllers.ScheduledTaskExecutionLogController;
+import io.github._0xorigin.flexscheduler.services.ScheduledTaskExecutionLogServiceImpl;
 import io.github._0xorigin.flexscheduler.services.TaskSchedulerServiceImpl;
+import io.github._0xorigin.flexscheduler.services.base.ScheduledTaskExecutionLogService;
 import io.github._0xorigin.flexscheduler.services.base.TaskSchedulerService;
 import io.github._0xorigin.flexscheduler.base.registries.SystemTaskRegistry;
 import io.github._0xorigin.flexscheduler.base.factories.mappers.base.CreateToEntityMapperFactory;
@@ -42,11 +47,6 @@ public class FlexSchedulerServiceAutoConfiguration {
     @Bean
     public ScheduledTaskSpecification scheduledTaskSpecification() {
         return new ScheduledTaskSpecificationImpl();
-    }
-
-    @Bean
-    public ScheduledTaskExecutionLogSpecification scheduledTaskExecutionLogSpecification() {
-        return new ScheduledTaskExecutionLogSpecificationImpl();
     }
 
     @Bean
@@ -117,5 +117,27 @@ public class FlexSchedulerServiceAutoConfiguration {
     @Bean
     public ValidTaskTypeValidator validTaskTypeValidator(TaskSchedulerOperator taskSchedulerOperator) {
         return new ValidTaskTypeValidator(taskSchedulerOperator);
+    }
+
+    @Bean
+    public ScheduledTaskExecutionLogSpecification scheduledTaskExecutionLogSpecification() {
+        return new ScheduledTaskExecutionLogSpecificationImpl();
+    }
+
+    @Bean
+    public ScheduledTaskExecutionLogService scheduledTaskExecutionLogService(
+        ScheduledTaskExecutionLogRepository logRepository,
+        QueryFilterBuilder<ScheduledTaskExecutionLogEntity> queryFilterBuilder,
+        ScheduledTaskExecutionLogSpecification logSpecification,
+        ScheduledTaskExecutionLogMapper logMapper
+    ) {
+        return new ScheduledTaskExecutionLogServiceImpl(logRepository, queryFilterBuilder, logSpecification, logMapper);
+    }
+
+    @Bean
+    public ScheduledTaskExecutionLogController scheduledTaskExecutionLogController(
+        ScheduledTaskExecutionLogService logService
+    ) {
+        return  new ScheduledTaskExecutionLogController(logService);
     }
 }
