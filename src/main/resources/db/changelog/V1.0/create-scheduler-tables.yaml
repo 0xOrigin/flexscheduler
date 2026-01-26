@@ -1,0 +1,264 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-scheduled-tasks-and-execution-logs
+      author: system
+      changes:
+        # Create scheduled_tasks table
+        - createTable:
+            tableName: scheduled_tasks
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(500)
+              - column:
+                  name: task_type
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type_of_execution
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cron_expression
+                  type: VARCHAR(255)
+              - column:
+                  name: planned_execution_time
+                  type: TIMESTAMPTZ
+              - column:
+                  name: start_date_time
+                  type: TIMESTAMPTZ
+              - column:
+                  name: duration
+                  type: BIGINT
+                  remarks: Stored as milliseconds (converted by DurationAttributeConverter)
+              - column:
+                  name: next_execution_time
+                  type: TIMESTAMPTZ
+              - column:
+                  name: arguments
+                  type: JSONB
+                  remarks: PostgreSQL JSONB column for flexible arguments
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_execution_finished
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: has_end
+                  type: BOOLEAN
+                  remarks: "Indicates if the task has an explicit end time"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_execution_time
+                  type: TIMESTAMPTZ
+                  remarks: "Optional end time for task executions"
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: true
+              - column:
+                  name: claimed_by
+                  type: VARCHAR(255)
+              - column:
+                  name: last_claimed_at
+                  type: TIMESTAMPTZ
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValue: 0
+
+        # Add all indexes for scheduled_tasks
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduled_tasks_id
+            clustered: true
+            columns:
+              - column:
+                  name: id
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduled_tasks_name
+            columns:
+              - column:
+                  name: name
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduled_tasks_task_type
+            columns:
+              - column:
+                  name: task_type
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduled_tasks_is_active
+            columns:
+              - column:
+                  name: is_active
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduled_tasks_type_of_execution
+            columns:
+              - column:
+                  name: type_of_execution
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduled_tasks_created_at
+            columns:
+              - column:
+                  name: created_at
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduled_tasks_is_execution_finished
+            columns:
+              - column:
+                  name: is_execution_finished
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduled_tasks_end_execution_time
+            columns:
+              - column:
+                  name: end_execution_time
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduler_pod_ownership
+            columns:
+              - column:
+                  name: claimed_by
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduler_stale_recovery
+            columns:
+              - column:
+                  name: last_claimed_at
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduled_tasks_active_execution_finished_next_execution_time
+            columns:
+              - column:
+                  name: is_active
+              - column:
+                  name: is_execution_finished
+              - column:
+                  name: next_execution_time
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduler_claim_lookup
+            columns:
+              - column:
+                  name: is_active
+              - column:
+                  name: is_execution_finished
+              - column:
+                  name: next_execution_time
+              - column:
+                  name: claimed_by
+
+        # Create scheduled_task_execution_logs table
+        - createTable:
+            tableName: scheduled_task_execution_logs
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: task_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: started_at
+                  type: TIMESTAMPTZ
+                  constraints:
+                    nullable: false
+              - column:
+                  name: finished_at
+                  type: TIMESTAMPTZ
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  defaultValue: STARTED
+                  constraints:
+                    nullable: false
+              - column:
+                  name: result
+                  type: JSONB
+
+        - sql:
+            comment: Restrict status to only STARTED, SUCCESS, FAILED
+            dbms: postgresql
+            sql: |
+              ALTER TABLE scheduled_task_execution_logs
+              ADD CONSTRAINT check_execution_log_status
+              CHECK (status IN ('STARTED', 'SUCCESS', 'FAILED'));
+
+        # Foreign key from execution logs to scheduled_tasks with CASCADE delete
+        - addForeignKeyConstraint:
+            baseTableName: scheduled_task_execution_logs
+            baseColumnNames: task_id
+            referencedTableName: scheduled_tasks
+            referencedColumnNames: id
+            constraintName: fk_execution_log_task
+            onDelete: CASCADE
+            onUpdate: CASCADE
+
+        # Indexes for execution logs table
+        - createIndex:
+            tableName: scheduled_task_execution_logs
+            indexName: idx_scheduled_task_execution_logs_id
+            clustered: true
+            columns:
+              - column:
+                  name: id
+        - createIndex:
+            tableName: scheduled_task_execution_logs
+            indexName: idx_scheduled_task_execution_logs_task_id
+            columns:
+              - column:
+                  name: task_id
+        - createIndex:
+            tableName: scheduled_task_execution_logs
+            indexName: idx_scheduled_task_execution_logs_started_at
+            columns:
+              - column:
+                  name: started_at
+        - createIndex:
+            tableName: scheduled_task_execution_logs
+            indexName: idx_scheduled_task_execution_logs_finished_at
+            columns:
+              - column:
+                  name: finished_at
+        - createIndex:
+            tableName: scheduled_task_execution_logs
+            indexName: idx_scheduled_task_execution_logs_status
+            columns:
+              - column:
+                  name: status

@@ -1,0 +1,103 @@
+package io.github._0xorigin.flexscheduler.base.dtos;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
+import io.github._0xorigin.flexscheduler.base.validation.ValidCronExpression;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.time.OffsetDateTime;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class CronScheduledTaskRequest extends CreateScheduledTaskRequest {
+
+    @NotBlank
+    @ValidCronExpression
+    private String cronExpression;
+
+    public CronScheduledTaskRequest() {
+        this.typeOfExecution = TaskExecutionType.CRON;
+    }
+
+    public CronScheduledTaskRequest(Builder builder) {
+        super(
+            builder.name,
+            builder.taskType,
+            TaskExecutionType.CRON,
+            builder.arguments,
+            builder.isActive,
+            builder.createdAt,
+            builder.description,
+            builder.hasEnd,
+            builder.endExecutionTime
+        );
+        this.cronExpression = builder.cronExpression;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String name;
+        private String taskType;
+        private JsonNode arguments;
+        private Boolean isActive;
+        private OffsetDateTime createdAt;
+        private String cronExpression;
+        private Boolean hasEnd;
+        private OffsetDateTime endExecutionTime;
+        private String description;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder taskType(String taskType) {
+            this.taskType = taskType;
+            return this;
+        }
+
+        public Builder arguments(JsonNode arguments) {
+            this.arguments = arguments;
+            return this;
+        }
+
+        public Builder isActive(Boolean isActive) {
+            this.isActive = isActive;
+            return this;
+        }
+
+        public Builder createdAt(OffsetDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder cronExpression(String cronExpression) {
+            this.cronExpression = cronExpression;
+            return this;
+        }
+
+        public Builder hasEnd(Boolean hasEnd) {
+            this.hasEnd = hasEnd;
+            return this;
+        }
+
+        public Builder endExecutionTime(OffsetDateTime endExecutionTime) {
+            this.endExecutionTime = endExecutionTime;
+            return this;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public CronScheduledTaskRequest build() {
+            return new CronScheduledTaskRequest(this);
+        }
+    }
+}

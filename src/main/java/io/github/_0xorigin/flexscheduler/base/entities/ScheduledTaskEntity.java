@@ -1,0 +1,123 @@
+package io.github._0xorigin.flexscheduler.base.entities;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import io.github._0xorigin.flexscheduler.base.converters.DurationAttributeConverter;
+import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
+import io.github._0xorigin.flexscheduler.base.generators.uuid.UUIDv7;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
+
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "scheduled_tasks", indexes = {
+    @Index(name = "idx_scheduled_tasks_id", columnList = "id"),
+    @Index(name = "idx_scheduled_tasks_name", columnList = "name"),
+    @Index(name = "idx_scheduled_tasks_task_type", columnList = "taskType"),
+    @Index(name = "idx_scheduled_tasks_is_active", columnList = "isActive"),
+    @Index(name = "idx_scheduled_tasks_type_of_execution", columnList = "typeOfExecution"),
+    @Index(name = "idx_scheduled_tasks_created_at", columnList = "createdAt"),
+    @Index(name = "idx_scheduled_tasks_is_execution_finished", columnList = "isExecutionFinished"),
+    @Index(name = "idx_scheduled_tasks_end_execution_time", columnList = "endExecutionTime"),
+    @Index(name = "idx_scheduler_pod_ownership", columnList = "claimedBy"),
+    @Index(name = "idx_scheduler_stale_recovery", columnList = "lastClaimedAt"),
+    @Index(
+        name = "idx_scheduled_tasks_active_execution_finished_next_execution_time",
+        columnList = "isActive,isExecutionFinished,nextExecutionTime"
+    ),
+    @Index(
+        name = "idx_scheduler_claim_lookup",
+        columnList = "isActive,isExecutionFinished,nextExecutionTime,claimedBy"
+    )
+})
+public class ScheduledTaskEntity {
+
+    @Id
+    @GeneratedValue
+    @UUIDv7
+    private UUID id;
+
+    @NotBlank
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "description", nullable = true, length = 500)
+    private String description;
+
+    @NotBlank
+    @Column(name = "task_type", nullable = false)
+    private String taskType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_of_execution", nullable = false)
+    private TaskExecutionType typeOfExecution;
+
+    @Column(name = "cron_expression")
+    private String cronExpression;
+
+    @Column(name = "planned_execution_time")
+    private OffsetDateTime plannedExecutionTime;
+
+    @Column(name = "start_date_time")
+    private OffsetDateTime startDateTime;
+
+    @Column(name = "duration")
+    @Convert(converter = DurationAttributeConverter.class)
+    private Duration duration;
+
+    @Column(name = "next_execution_time")
+    private OffsetDateTime nextExecutionTime;
+
+    @Column(name = "arguments", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private JsonNode arguments;
+
+    @Column(name = "is_active", nullable = false)
+    @ColumnDefault("true")
+    private Boolean isActive;
+
+    @Column(name = "is_execution_finished", nullable = false)
+    @ColumnDefault("false")
+    private Boolean isExecutionFinished;
+
+    @Column(name = "has_end", nullable = false)
+    private Boolean hasEnd;
+
+    @Column(name = "end_execution_time")
+    private OffsetDateTime endExecutionTime;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private OffsetDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = true, insertable = false)
+    @UpdateTimestamp
+    private OffsetDateTime updatedAt;
+
+    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
+    private List<ScheduledTaskExecutionLogEntity> executionLogs = new ArrayList<>();
+
+    @Column(name = "claimed_by")
+    private String claimedBy;
+
+    @Column(name = "last_claimed_at")
+    private OffsetDateTime lastClaimedAt;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    @ColumnDefault("0")
+    private Long version;
+}

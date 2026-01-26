@@ -1,0 +1,50 @@
+package io.github._0xorigin.flexscheduler.base.repositories;
+
+import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface ScheduledTaskRepository extends JpaRepository<ScheduledTaskEntity, UUID>, JpaSpecificationExecutor<ScheduledTaskEntity> {
+    @Query("""
+        SELECT DISTINCT t FROM ScheduledTaskEntity t
+        LEFT JOIN FETCH t.executionLogs l
+        WHERE t.isActive = true
+        AND t.isExecutionFinished = false
+        AND t.nextExecutionTime BETWEEN :startDate AND :endDate
+    """)
+    List<ScheduledTaskEntity> findAllActiveTasksInDateRange(
+        @Param("startDate") OffsetDateTime startDate,
+        @Param("endDate") OffsetDateTime endDate
+    );
+
+    @Query("""
+        SELECT DISTINCT t FROM ScheduledTaskEntity t
+        LEFT JOIN FETCH t.executionLogs l
+        WHERE t.isActive = true
+        AND t.isExecutionFinished = false
+        AND t.nextExecutionTime BETWEEN :startDate AND :endDate
+        AND t.taskType not in :systemTaskTypes
+    """)
+    List<ScheduledTaskEntity> findAllActiveTasksInDateRangeExcludeSystemTasks(
+            @Param("startDate") OffsetDateTime startDate,
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("systemTaskTypes") List<String> systemTaskTypes
+    );
+
+    List<ScheduledTaskEntity> findAllByTaskType(String taskType);
+
+    long countByIsExecutionFinishedTrue();
+
+    @Modifying
+    @Query("DELETE FROM ScheduledTaskEntity t WHERE t.isExecutionFinished = true")
+    void deleteByIsExecutionFinishedTrue();
+}
