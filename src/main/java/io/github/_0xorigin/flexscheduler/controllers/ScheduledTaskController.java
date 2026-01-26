@@ -64,9 +64,4 @@ public class ScheduledTaskController {
         taskSchedulerService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
-    /*
-      - list with filtering, for json fields- last execution failed tasks
-      - update endpoint
-     */
 }

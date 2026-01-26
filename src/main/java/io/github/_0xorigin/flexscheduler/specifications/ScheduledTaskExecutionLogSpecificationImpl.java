@@ -30,6 +30,7 @@ public class ScheduledTaskExecutionLogSpecificationImpl implements ScheduledTask
                             .addSorts("id")
                             .addSorts("startedAt")
                             .addSorts("finishedAt")
+                            .addSorts("status")
                 )
                 .buildTemplate();
     }
