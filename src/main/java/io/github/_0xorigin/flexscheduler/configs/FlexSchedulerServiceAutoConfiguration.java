@@ -9,6 +9,8 @@ import io.github._0xorigin.flexscheduler.base.filters.base.TodayTaskFilter;
 import io.github._0xorigin.flexscheduler.base.mappers.ScheduledTaskMapper;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskExecutionLogRepository;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskRepository;
+import io.github._0xorigin.flexscheduler.base.services.NextExecutionServiceImpl;
+import io.github._0xorigin.flexscheduler.base.services.base.NextExecutionService;
 import io.github._0xorigin.flexscheduler.base.validation.ValidTaskTypeValidator;
 import io.github._0xorigin.flexscheduler.controllers.ScheduledTaskController;
 import io.github._0xorigin.flexscheduler.base.operators.TaskSchedulerOperatorImpl;
@@ -33,6 +35,11 @@ import java.util.List;
 @Import({MapperConfig.class, SystemTaskConfig.class})
 public class FlexSchedulerServiceAutoConfiguration {
     @Bean
+    public NextExecutionService nextExecutionTimeService() {
+        return new NextExecutionServiceImpl();
+    }
+
+    @Bean
     public ScheduledTaskSpecification scheduledTaskSpecification() {
         return new ScheduledTaskSpecificationImpl();
     }
@@ -43,7 +50,9 @@ public class FlexSchedulerServiceAutoConfiguration {
     }
 
     @Bean
-    public TodayTaskFilter todayTaskFilter(ScheduledTaskRepository taskRepository) {
+    public TodayTaskFilter todayTaskFilter(
+        ScheduledTaskRepository taskRepository
+    ) {
         return new TodayTaskFilterImpl(taskRepository);
     }
 
@@ -65,17 +74,28 @@ public class FlexSchedulerServiceAutoConfiguration {
         ScheduledTaskSpecification scheduledTaskSpecification,
         QueryFilterBuilder<ScheduledTaskEntity> queryFilterBuilder,
         TodayTaskFilter todayTaskFilter,
-        TaskSchedulerOperator taskSchedulerOperator
+        TaskSchedulerOperator taskSchedulerOperator,
+        NextExecutionService nextExecutionService
     ) {
-        return new TaskSchedulerServiceImpl(mappers, taskRepository, taskMapper, scheduledTaskSpecification, queryFilterBuilder, todayTaskFilter, taskSchedulerOperator);
+        return new TaskSchedulerServiceImpl(
+            mappers,
+            taskRepository,
+            taskMapper,
+            scheduledTaskSpecification,
+            queryFilterBuilder,
+            todayTaskFilter,
+            taskSchedulerOperator,
+            nextExecutionService
+        );
     }
 
     @Bean
     public ScheduledTaskExecutor scheduledTaskExecutor(
         ScheduledTaskRepository taskRepository,
-        ScheduledTaskExecutionLogRepository logRepository
+        ScheduledTaskExecutionLogRepository logRepository,
+        NextExecutionService nextExecutionService
     ) {
-        return new ScheduledTaskExecutorImpl(taskRepository, logRepository);
+        return new ScheduledTaskExecutorImpl(taskRepository, logRepository, nextExecutionService);
     }
 
     @Bean

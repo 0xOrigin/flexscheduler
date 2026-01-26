@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskEntity;
 import io.github._0xorigin.flexscheduler.base.entities.ScheduledTaskExecutionLogEntity;
 import io.github._0xorigin.flexscheduler.base.enums.ScheduledTaskExecutionStatus;
-import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
 import io.github._0xorigin.flexscheduler.base.executors.base.ScheduledTaskExecutor;
 import io.github._0xorigin.flexscheduler.base.factories.tasks.base.ScheduledTaskFactory;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskExecutionLogRepository;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskRepository;
+import io.github._0xorigin.flexscheduler.base.services.base.NextExecutionService;
 import io.github._0xorigin.flexscheduler.utils.JsonNodeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +23,16 @@ public class ScheduledTaskExecutorImpl implements ScheduledTaskExecutor {
     private final Logger log = LoggerFactory.getLogger("ScheduledTaskExecutor");
     private final ScheduledTaskRepository taskRepository;
     private final ScheduledTaskExecutionLogRepository logRepository;
+    private final NextExecutionService nextExecutionService;
 
     public ScheduledTaskExecutorImpl(
         ScheduledTaskRepository taskRepository,
-        ScheduledTaskExecutionLogRepository logRepository
+        ScheduledTaskExecutionLogRepository logRepository,
+        NextExecutionService nextExecutionService
     ) {
         this.taskRepository = taskRepository;
         this.logRepository = logRepository;
+        this.nextExecutionService = nextExecutionService;
     }
 
     @Override
@@ -89,12 +92,11 @@ public class ScheduledTaskExecutorImpl implements ScheduledTaskExecutor {
     }
 
     private void finalizeTaskExecution(ScheduledTaskEntity task, ScheduledTaskExecutionLogEntity execution) {
-        execution.setFinishedAt(OffsetDateTime.now());
+        OffsetDateTime now = OffsetDateTime.now();
+        execution.setFinishedAt(now);
         saveExecutionLog(execution);
-        if (task.getTypeOfExecution() == TaskExecutionType.DATETIME) {
-            task.setIsExecutionFinished(true);
-            saveTask(task);
-        }
+        nextExecutionService.computeAndSetNextExecutionFieldsAfterTaskExecution(task, now);
+        saveTask(task);
     }
 
     private ScheduledTaskEntity saveTask(ScheduledTaskEntity task) {

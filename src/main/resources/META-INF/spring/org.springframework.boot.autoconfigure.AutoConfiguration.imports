@@ -1,3 +1,4 @@
+io.github._0xorigin.flexscheduler.configs.LocalizationConfig
 io.github._0xorigin.flexscheduler.configs.AsyncConfig
 io.github._0xorigin.flexscheduler.configs.TaskSchedulerConfig
 io.github._0xorigin.flexscheduler.configs.FlexSchedulerPackageAutoConfiguration

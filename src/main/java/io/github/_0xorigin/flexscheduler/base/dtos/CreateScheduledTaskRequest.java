@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import io.github._0xorigin.flexscheduler.base.validation.ValidTaskType;
@@ -33,4 +34,13 @@ public abstract class CreateScheduledTaskRequest {
     protected Boolean isActive;
     protected OffsetDateTime createdAt;
     protected String description;
+    protected Boolean hasEnd;
+    protected OffsetDateTime endExecutionTime;
+
+    @AssertTrue(message = "endExecutionTime must be not null when hasEnd is true")
+    public boolean isEndExecutionTimeValid() {
+        if (hasEnd == null || !hasEnd || typeOfExecution == TaskExecutionType.DATETIME)
+            return true;
+        return endExecutionTime != null;
+    }
 }

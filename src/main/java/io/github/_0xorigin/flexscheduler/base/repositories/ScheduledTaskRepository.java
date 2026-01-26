@@ -19,14 +19,7 @@ public interface ScheduledTaskRepository extends JpaRepository<ScheduledTaskEnti
         LEFT JOIN FETCH t.executionLogs l
         WHERE t.isActive = true
         AND t.isExecutionFinished = false
-        AND (
-            (t.typeOfExecution = 'DATETIME'
-                AND t.plannedExecutionTime >= :startDate
-                AND t.plannedExecutionTime <= :endDate)
-            OR (t.typeOfExecution = 'START_TIME_AND_DURATION'
-                AND t.startDateTime <= :endDate)
-            OR (t.typeOfExecution = 'CRON')
-        )
+        AND t.nextExecutionTime BETWEEN :startDate AND :endDate
     """)
     List<ScheduledTaskEntity> findAllActiveTasksInDateRange(
         @Param("startDate") OffsetDateTime startDate,
@@ -38,15 +31,8 @@ public interface ScheduledTaskRepository extends JpaRepository<ScheduledTaskEnti
         LEFT JOIN FETCH t.executionLogs l
         WHERE t.isActive = true
         AND t.isExecutionFinished = false
+        AND t.nextExecutionTime BETWEEN :startDate AND :endDate
         AND t.taskType not in :systemTaskTypes
-        AND (
-            (t.typeOfExecution = 'DATETIME'
-                AND t.plannedExecutionTime >= :startDate
-                AND t.plannedExecutionTime <= :endDate)
-            OR (t.typeOfExecution = 'START_TIME_AND_DURATION'
-                AND t.startDateTime <= :endDate)
-            OR (t.typeOfExecution = 'CRON')
-        )
     """)
     List<ScheduledTaskEntity> findAllActiveTasksInDateRangeExcludeSystemTasks(
             @Param("startDate") OffsetDateTime startDate,

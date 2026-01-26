@@ -6,17 +6,19 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
 
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class CronScheduledTaskRequest extends CreateScheduledTaskRequest {
 
     @NotBlank
     private String cronExpression;
+
+    public CronScheduledTaskRequest() {
+        this.typeOfExecution = TaskExecutionType.CRON;
+    }
 
     public CronScheduledTaskRequest(Builder builder) {
         super(
@@ -26,13 +28,15 @@ public class CronScheduledTaskRequest extends CreateScheduledTaskRequest {
             builder.arguments,
             builder.isActive,
             builder.createdAt,
-            builder.description
+            builder.description,
+            builder.hasEnd,
+            builder.endExecutionTime
         );
         this.cronExpression = builder.cronExpression;
     }
 
     @AssertTrue(message = "cronExpression must be not blank when typeOfExecution is CRON")
-    private boolean isCronExpressionValid() {
+    public boolean isCronExpressionValid() {
         return typeOfExecution != TaskExecutionType.CRON || (cronExpression != null && !cronExpression.isBlank());
     }
 
@@ -47,6 +51,8 @@ public class CronScheduledTaskRequest extends CreateScheduledTaskRequest {
         private Boolean isActive;
         private OffsetDateTime createdAt;
         private String cronExpression;
+        private Boolean hasEnd;
+        private OffsetDateTime endExecutionTime;
         private String description;
 
         public Builder name(String name) {
@@ -79,6 +85,16 @@ public class CronScheduledTaskRequest extends CreateScheduledTaskRequest {
             return this;
         }
 
+        public Builder hasEnd(Boolean hasEnd) {
+            this.hasEnd = hasEnd;
+            return this;
+        }
+
+        public Builder endExecutionTime(OffsetDateTime endExecutionTime) {
+            this.endExecutionTime = endExecutionTime;
+            return this;
+        }
+
         public Builder description(String description) {
             this.description = description;
             return this;
@@ -89,5 +105,3 @@ public class CronScheduledTaskRequest extends CreateScheduledTaskRequest {
         }
     }
 }
-
-

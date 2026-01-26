@@ -2,17 +2,14 @@ package io.github._0xorigin.flexscheduler.base.dtos;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
 
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class StartTimeDurationScheduledTaskRequest extends CreateScheduledTaskRequest {
 
@@ -22,6 +19,10 @@ public class StartTimeDurationScheduledTaskRequest extends CreateScheduledTaskRe
     @NotNull
     private Duration duration;
 
+    public StartTimeDurationScheduledTaskRequest() {
+        this.typeOfExecution = TaskExecutionType.START_TIME_AND_DURATION;
+    }
+
     public StartTimeDurationScheduledTaskRequest(Builder builder) {
         super(
             builder.name,
@@ -30,15 +31,12 @@ public class StartTimeDurationScheduledTaskRequest extends CreateScheduledTaskRe
             builder.arguments,
             builder.isActive,
             builder.createdAt,
-            builder.description
+            builder.description,
+            builder.hasEnd,
+            builder.endExecutionTime
         );
         this.startDateTime = builder.startDateTime;
         this.duration = builder.duration;
-    }
-
-    @AssertTrue(message = "startDateTime and duration must be not null when typeOfExecution is START_TIME_AND_DURATION")
-    private boolean isStartDateTimeAndDurationValid() {
-        return typeOfExecution != TaskExecutionType.START_TIME_AND_DURATION || (startDateTime != null && duration != null);
     }
 
     public static Builder builder() {
@@ -53,6 +51,8 @@ public class StartTimeDurationScheduledTaskRequest extends CreateScheduledTaskRe
         private OffsetDateTime createdAt;
         private OffsetDateTime startDateTime;
         private Duration duration;
+        private Boolean hasEnd;
+        private OffsetDateTime endExecutionTime;
         private String description;
 
         public Builder name(String name) {
@@ -90,6 +90,16 @@ public class StartTimeDurationScheduledTaskRequest extends CreateScheduledTaskRe
             return this;
         }
 
+        public Builder hasEnd(Boolean hasEnd) {
+            this.hasEnd = hasEnd;
+            return this;
+        }
+
+        public Builder endExecutionTime(OffsetDateTime endExecutionTime) {
+            this.endExecutionTime = endExecutionTime;
+            return this;
+        }
+
         public Builder description(String description) {
             this.description = description;
             return this;
@@ -100,5 +110,3 @@ public class StartTimeDurationScheduledTaskRequest extends CreateScheduledTaskRe
         }
     }
 }
-
-

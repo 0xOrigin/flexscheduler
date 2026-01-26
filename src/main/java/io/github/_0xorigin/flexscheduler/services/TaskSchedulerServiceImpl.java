@@ -7,6 +7,7 @@ import io.github._0xorigin.flexscheduler.base.filters.base.TodayTaskFilter;
 import io.github._0xorigin.flexscheduler.base.mappers.ScheduledTaskMapper;
 import io.github._0xorigin.flexscheduler.base.operators.base.TaskSchedulerOperator;
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskRepository;
+import io.github._0xorigin.flexscheduler.base.services.base.NextExecutionService;
 import io.github._0xorigin.flexscheduler.dtos.ScheduledTaskListResponse;
 import io.github._0xorigin.flexscheduler.dtos.ScheduledTaskRetrieveResponse;
 import io.github._0xorigin.flexscheduler.services.base.TaskSchedulerService;
@@ -33,6 +34,7 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
     private final QueryFilterBuilder<ScheduledTaskEntity> queryFilterBuilder;
     private final TodayTaskFilter todayTaskFilter;
     private final TaskSchedulerOperator schedulerOperator;
+    private final NextExecutionService nextExecutionService;
 
     public TaskSchedulerServiceImpl(
         List<CreateToEntityMapperFactory> mappers,
@@ -41,7 +43,8 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
         ScheduledTaskSpecification scheduledTaskSpecification,
         QueryFilterBuilder<ScheduledTaskEntity> queryFilterBuilder,
         TodayTaskFilter todayTaskFilter,
-        TaskSchedulerOperator taskSchedulerOperator
+        TaskSchedulerOperator taskSchedulerOperator,
+        NextExecutionService nextExecutionService
     ) {
         this.mappers = mappers;
         this.taskRepository = taskRepository;
@@ -50,6 +53,7 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
         this.queryFilterBuilder = queryFilterBuilder;
         this.todayTaskFilter = todayTaskFilter;
         this.schedulerOperator = taskSchedulerOperator;
+        this.nextExecutionService = nextExecutionService;
     }
 
     @Override
@@ -151,18 +155,10 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
         taskRepository.delete(task);
     }
 
-    private void setDefaultFields(ScheduledTaskEntity task) {
-        task.setIsExecutionFinished(false);
-    }
-
     private void scheduleTaskIfToday(ScheduledTaskEntity task, OffsetDateTime now) {
         if (
             Boolean.FALSE.equals(task.getIsExecutionFinished())
-            && (
-                todayTaskFilter.isDateTimeTypeAndWithInToday(task, now)
-                || todayTaskFilter.isCronTypeAndWithInToday(task, now)
-                || todayTaskFilter.isStartDateTimeAndDurationAndWithInToday(task, now)
-            )
+            && todayTaskFilter.isNextExecutionTimeWithInToday(task, now)
         )
             schedulerOperator.scheduleTask(task);
     }
@@ -188,8 +184,9 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
 
     private ScheduledTaskEntity mapRequestToEntityAndSetDefaults(CreateScheduledTaskRequest request) {
         CreateToEntityMapperFactory mapper = getMapper(request.getClass());
-        ScheduledTaskEntity taskEntity = mapper.toEntity(request);
-        setDefaultFields(taskEntity);
-        return taskEntity;
+        ScheduledTaskEntity task = mapper.toEntity(request);
+        task.setIsExecutionFinished(false);
+        nextExecutionService.computeAndSetNextExecutionFieldsOnTaskCreation(task, OffsetDateTime.now());
+        return task;
     }
 }

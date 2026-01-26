@@ -64,6 +64,16 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: has_end
+                  type: BOOLEAN
+                  remarks: "Indicates if the task has an explicit end time"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_execution_time
+                  type: TIMESTAMPTZ
+                  remarks: "Optional end time for task executions"
+              - column:
                   name: created_at
                   type: TIMESTAMPTZ
                   constraints:
@@ -88,6 +98,7 @@ databaseChangeLog:
         - createIndex:
             tableName: scheduled_tasks
             indexName: idx_scheduled_tasks_id
+            clustered: true
             columns:
               - column:
                   name: id
@@ -111,26 +122,10 @@ databaseChangeLog:
                   name: is_active
         - createIndex:
             tableName: scheduled_tasks
-            indexName: idx_scheduled_tasks_type_active
-            columns:
-              - column:
-                  name: task_type
-              - column:
-                  name: is_active
-        - createIndex:
-            tableName: scheduled_tasks
             indexName: idx_scheduled_tasks_type_of_execution
             columns:
               - column:
                   name: type_of_execution
-        - createIndex:
-            tableName: scheduled_tasks
-            indexName: idx_scheduled_tasks_active_planned_execution_time
-            columns:
-              - column:
-                  name: is_active
-              - column:
-                  name: planned_execution_time
         - createIndex:
             tableName: scheduled_tasks
             indexName: idx_scheduled_tasks_created_at
@@ -145,12 +140,16 @@ databaseChangeLog:
                   name: is_execution_finished
         - createIndex:
             tableName: scheduled_tasks
-            indexName: idx_scheduled_tasks_typeOfExecution_is_execution_finished
+            indexName: idx_scheduled_tasks_end_execution_time
             columns:
               - column:
-                  name: type_of_execution
+                  name: end_execution_time
+        - createIndex:
+            tableName: scheduled_tasks
+            indexName: idx_scheduler_pod_ownership
+            columns:
               - column:
-                  name: is_execution_finished
+                  name: claimed_by
         - createIndex:
             tableName: scheduled_tasks
             indexName: idx_scheduler_stale_recovery
@@ -159,10 +158,14 @@ databaseChangeLog:
                   name: last_claimed_at
         - createIndex:
             tableName: scheduled_tasks
-            indexName: idx_scheduler_pod_ownership
+            indexName: idx_scheduled_tasks_active_execution_finished_next_execution_time
             columns:
               - column:
-                  name: claimed_by
+                  name: is_active
+              - column:
+                  name: is_execution_finished
+              - column:
+                  name: next_execution_time
         - createIndex:
             tableName: scheduled_tasks
             indexName: idx_scheduler_claim_lookup
@@ -225,11 +228,13 @@ databaseChangeLog:
             referencedColumnNames: id
             constraintName: fk_execution_log_task
             onDelete: CASCADE
+            onUpdate: CASCADE
 
         # Indexes for execution logs table
         - createIndex:
             tableName: scheduled_task_execution_logs
             indexName: idx_scheduled_task_execution_logs_id
+            clustered: true
             columns:
               - column:
                   name: id

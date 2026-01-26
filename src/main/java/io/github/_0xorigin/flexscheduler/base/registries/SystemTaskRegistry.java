@@ -7,7 +7,8 @@ import io.github._0xorigin.flexscheduler.base.factories.tasks.ScheduledTaskLoade
 import io.github._0xorigin.flexscheduler.base.repositories.ScheduledTaskRepository;
 import io.github._0xorigin.flexscheduler.base.operators.base.TaskSchedulerOperator;
 import io.github._0xorigin.flexscheduler.services.base.TaskSchedulerService;
-import jakarta.annotation.PostConstruct;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class SystemTaskRegistry {
         this.taskSchedulerOperator = taskSchedulerOperator;
     }
 
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void init() {
         List<String> systemTaskTypes = List.of(ScheduledTaskLoader.TASK_TYPE, ScheduledTaskCleanup.TASK_TYPE);
@@ -49,6 +50,7 @@ public class SystemTaskRegistry {
                 .taskType(ScheduledTaskLoader.TASK_TYPE)
                 .cronExpression("0 0 0 * * *") // Every day at midnight
                 .isActive(true)
+                .hasEnd(false)
                 .build();
         ScheduledTaskEntity task = taskSchedulerService.createTaskInstance(scheduledTaskRequest);
         taskSchedulerOperator.scheduleTask(task);
@@ -63,6 +65,7 @@ public class SystemTaskRegistry {
             .taskType(ScheduledTaskCleanup.TASK_TYPE)
             .cronExpression("0 0 0 1 * ?") // Every first day of the month at midnight
             .isActive(true)
+            .hasEnd(false)
             .build();
         ScheduledTaskEntity task = taskSchedulerService.createTaskInstance(scheduledTaskRequest);
         taskSchedulerOperator.scheduleTask(task);

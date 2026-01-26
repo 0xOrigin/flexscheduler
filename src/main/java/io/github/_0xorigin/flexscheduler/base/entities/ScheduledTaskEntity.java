@@ -28,14 +28,16 @@ import java.util.UUID;
     @Index(name = "idx_scheduled_tasks_name", columnList = "name"),
     @Index(name = "idx_scheduled_tasks_task_type", columnList = "taskType"),
     @Index(name = "idx_scheduled_tasks_is_active", columnList = "isActive"),
-    @Index(name = "idx_scheduled_tasks_type_active", columnList = "taskType,isActive"),
     @Index(name = "idx_scheduled_tasks_type_of_execution", columnList = "typeOfExecution"),
-    @Index(name = "idx_scheduled_tasks_active_planned_execution_time", columnList = "isActive,plannedExecutionTime"),
     @Index(name = "idx_scheduled_tasks_created_at", columnList = "createdAt"),
     @Index(name = "idx_scheduled_tasks_is_execution_finished", columnList = "isExecutionFinished"),
-    @Index(name = "idx_scheduled_tasks_typeOfExecution_is_execution_finished", columnList = "typeOfExecution,isExecutionFinished"),
+    @Index(name = "idx_scheduled_tasks_end_execution_time", columnList = "endExecutionTime"),
     @Index(name = "idx_scheduler_pod_ownership", columnList = "claimedBy"),
     @Index(name = "idx_scheduler_stale_recovery", columnList = "lastClaimedAt"),
+    @Index(
+        name = "idx_scheduled_tasks_active_execution_finished_next_execution_time",
+        columnList = "isActive,isExecutionFinished,nextExecutionTime"
+    ),
     @Index(
         name = "idx_scheduler_claim_lookup",
         columnList = "isActive,isExecutionFinished,nextExecutionTime,claimedBy"
@@ -90,6 +92,12 @@ public class ScheduledTaskEntity {
     @Column(name = "is_execution_finished", nullable = false)
     @ColumnDefault("false")
     private Boolean isExecutionFinished;
+
+    @Column(name = "has_end", nullable = false)
+    private Boolean hasEnd;
+
+    @Column(name = "end_execution_time")
+    private OffsetDateTime endExecutionTime;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp

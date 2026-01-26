@@ -1,22 +1,33 @@
 package io.github._0xorigin.flexscheduler.base.dtos;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github._0xorigin.flexscheduler.base.enums.TaskExecutionType;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
 
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DateTimeScheduledTaskRequest extends CreateScheduledTaskRequest {
 
     @NotNull
     private OffsetDateTime plannedExecutionTime;
+
+    public DateTimeScheduledTaskRequest() {
+        super();
+        this.typeOfExecution = TaskExecutionType.DATETIME;
+        this.hasEnd = true;
+    }
+
+    // If client provides hasEnd in JSON, ignore it and always set true for DATETIME
+    @JsonSetter("hasEnd")
+    public void setHasEndForDatetime(Boolean ignored) {
+        this.hasEnd = true;
+    }
 
     public DateTimeScheduledTaskRequest(Builder builder) {
         super(
@@ -26,14 +37,11 @@ public class DateTimeScheduledTaskRequest extends CreateScheduledTaskRequest {
             builder.arguments,
             builder.isActive,
             builder.createdAt,
-            builder.description
+            builder.description,
+            true,
+            builder.plannedExecutionTime
         );
         this.plannedExecutionTime = builder.plannedExecutionTime;
-    }
-
-    @AssertTrue(message = "plannedExecutionTime must be not null when typeOfExecution is DATETIME")
-    private boolean isPlannedExecutionTimeValid() {
-        return typeOfExecution != TaskExecutionType.DATETIME || plannedExecutionTime != null;
     }
 
     public static Builder builder() {
@@ -89,5 +97,3 @@ public class DateTimeScheduledTaskRequest extends CreateScheduledTaskRequest {
         }
     }
 }
-
-
