@@ -77,6 +77,15 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
     }
 
     @Override
+    public List<ScheduledTaskEntity> createTasksInstances(List<? extends CreateScheduledTaskRequest> requests) {
+        Objects.requireNonNull(requests);
+        List<ScheduledTaskEntity> tasks = requests.stream()
+            .map(this::mapRequestToEntityAndSetDefaults)
+            .toList();
+        return taskRepository.saveAllAndFlush(tasks);
+    }
+
+    @Override
     @Transactional
     public ScheduledTaskRetrieveResponse createTask(@Valid CreateScheduledTaskRequest request) {
         ScheduledTaskEntity taskEntity = createTaskInstance(request);
@@ -93,14 +102,14 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
 
     @Override
     @Transactional
-    public List<ScheduledTaskListResponse> createTasks(List<@Valid CreateScheduledTaskRequest> requests) {
+    public List<ScheduledTaskListResponse> createTasks(List<@Valid ? extends CreateScheduledTaskRequest> requests) {
         List<ScheduledTaskEntity> tasks = createTasksInstances(requests);
         return taskMapper.entitiesToListResponses(tasks);
     }
 
     @Override
     @Transactional
-    public List<ScheduledTaskListResponse> createTasksAndSchedule(List<@Valid CreateScheduledTaskRequest> requests) {
+    public List<ScheduledTaskListResponse> createTasksAndSchedule(List<@Valid ? extends CreateScheduledTaskRequest> requests) {
         List<ScheduledTaskEntity> tasks = createTasksInstances(requests);
         scheduleTasksIfExecuteToday(tasks);
         return taskMapper.entitiesToListResponses(tasks);
@@ -158,14 +167,6 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
             && todayTaskFilter.isNextExecutionTimeWithInToday(task, now)
         )
             schedulerOperator.scheduleTask(task);
-    }
-
-    private List<ScheduledTaskEntity> createTasksInstances(List<CreateScheduledTaskRequest> requests) {
-        Objects.requireNonNull(requests);
-        List<ScheduledTaskEntity> tasks = requests.stream()
-                .map(this::mapRequestToEntityAndSetDefaults)
-                .toList();
-        return taskRepository.saveAllAndFlush(tasks);
     }
 
     private CreateToEntityMapperFactory getMapper(Class<?> clazz) {

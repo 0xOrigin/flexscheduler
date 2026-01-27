@@ -17,10 +17,11 @@ public interface TaskSchedulerService {
     void scheduleTaskIfExecuteToday(ScheduledTaskEntity scheduledTask);
     void scheduleTasksIfExecuteToday(List<ScheduledTaskEntity> scheduledTasks);
     ScheduledTaskEntity createTaskInstance(@Valid CreateScheduledTaskRequest request);
+    List<ScheduledTaskEntity> createTasksInstances(List<? extends CreateScheduledTaskRequest> requests);
     ScheduledTaskRetrieveResponse createTask(@Valid CreateScheduledTaskRequest request);
     ScheduledTaskRetrieveResponse createTaskAndSchedule(@Valid CreateScheduledTaskRequest request);
-    List<ScheduledTaskListResponse> createTasks(List<@Valid CreateScheduledTaskRequest> requests);
-    List<ScheduledTaskListResponse> createTasksAndSchedule(List<@Valid CreateScheduledTaskRequest> requests);
+    List<ScheduledTaskListResponse> createTasks(List<@Valid ? extends CreateScheduledTaskRequest> requests);
+    List<ScheduledTaskListResponse> createTasksAndSchedule(List<@Valid ? extends CreateScheduledTaskRequest> requests);
     List<ScheduledTaskListResponse> list(HttpServletRequest httpServletRequest);
     ScheduledTaskRetrieveResponse retrieve(UUID id);
     void scheduleTaskIfExecuteToday(UUID id);

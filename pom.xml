@@ -5,7 +5,7 @@
 
 	<groupId>io.github.0xorigin</groupId>
 	<artifactId>flexscheduler</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<name>Flexscheduler</name>
 	<packaging>jar</packaging>
 	<description>A dynamic task scheduler for Spring boot applications</description>
@@ -33,7 +33,7 @@
 		<url>https://github.com/0xOrigin/flexscheduler</url>
 		<connection>scm:git:git://github.com/0xOrigin/flexscheduler.git</connection>
 		<developerConnection>scm:git:ssh://github.com/0xOrigin/flexscheduler.git</developerConnection>
-		<tag>v0.0.2</tag>
+		<tag>v0.0.3</tag>
 	</scm>
 
 	<issueManagement>
