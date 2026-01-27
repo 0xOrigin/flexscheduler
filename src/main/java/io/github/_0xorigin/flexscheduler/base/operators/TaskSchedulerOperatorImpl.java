@@ -5,15 +5,14 @@ import io.github._0xorigin.flexscheduler.base.executors.base.ScheduledTaskExecut
 import io.github._0xorigin.flexscheduler.base.factories.tasks.base.ScheduledTaskFactory;
 import io.github._0xorigin.flexscheduler.base.filters.base.TodayTaskFilter;
 import io.github._0xorigin.flexscheduler.base.operators.base.TaskSchedulerOperator;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.support.CronExpression;
 import org.springframework.scheduling.support.CronTrigger;
 
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +39,7 @@ public class TaskSchedulerOperatorImpl implements TaskSchedulerOperator {
     }
 
     @Override
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     public void init() {
         log.info("Registered task types: {}", factoryTypes.keySet());
         scheduleAllActiveTasks();
@@ -148,14 +147,7 @@ public class TaskSchedulerOperatorImpl implements TaskSchedulerOperator {
     }
 
     private void logScheduledTask(ScheduledTaskEntity task) {
-        switch (task.getTypeOfExecution()) {
-            case CRON -> {
-                CronExpression cron = CronExpression.parse(task.getCronExpression());
-                log.info("Scheduled task [{}] - '{}', (type: {}), next run at: {}", task.getId(), task.getName(), task.getTaskType(), cron.next(OffsetDateTime.now()));
-            }
-            case DATETIME -> log.info("Scheduled task [{}] - '{}' (type: {}), at: {}", task.getId(), task.getName(), task.getTaskType(), task.getPlannedExecutionTime());
-            case START_TIME_AND_DURATION -> log.info("Scheduled task [{}] - '{}' (type: {})", task.getId(), task.getName(), task.getTaskType());
-        }
+        log.info("Scheduled task [{}] - '{}', (type: {}), next run at: {}", task.getId(), task.getName(), task.getTaskType(), task.getNextExecutionTime());
     }
 
     private void registerFactories(List<ScheduledTaskFactory> factories) {
